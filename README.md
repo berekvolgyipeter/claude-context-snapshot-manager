@@ -1,0 +1,1 @@
+# claude-context-snapshot-manager
