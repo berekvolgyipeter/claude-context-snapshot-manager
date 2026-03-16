@@ -11,6 +11,7 @@ ctx-help() {
   echo "ctx-which       Show which snapshot is active"
   echo "ctx-restore     Restore original file from .bak backup"
   echo "ctx-pull        Copy snapshots to repo .context/"
+  echo "ctx-push [name] Push snapshot(s) from repo .context/ to ~/.context/"
   echo "ctx-help        Show this help"
 }
 
@@ -76,6 +77,27 @@ ctx-pull() {
     count=$((count + 1))
   done
   echo "Copied $count snapshot(s) to $dest"
+}
+
+# Push snapshot(s) from repo .context/ to ~/.context/
+ctx-push() {
+  local src="$CTX_REPO_DIR/.context"
+  [ ! -d "$src" ] && echo "No .context/ directory found in repo" && return 1
+  mkdir -p "$CTX_DIR"
+  if [ -n "$1" ]; then
+    local f="$src/mcp-codebase-snapshot-$1.json"
+    [ ! -f "$f" ] && echo "Not found: $f" && return 1
+    cp "$f" "$CTX_DIR/"
+    echo "Pushed $1 to $CTX_DIR"
+  else
+    local count=0
+    for f in "$src"/mcp-codebase-snapshot-*.json; do
+      [ ! -f "$f" ] && echo "No snapshots found in $src" && return 1
+      cp "$f" "$CTX_DIR/"
+      count=$((count + 1))
+    done
+    echo "Pushed $count snapshot(s) to $CTX_DIR"
+  fi
 }
 
 # Print current snapshot contents
