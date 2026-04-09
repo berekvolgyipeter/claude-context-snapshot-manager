@@ -10,8 +10,9 @@ ctx-help() {
   echo "ctx-read        Print current snapshot contents"
   echo "ctx-which       Show which snapshot is active"
   echo "ctx-restore     Restore original file from .bak backup"
-  echo "ctx-pull        Copy snapshots to repo .context/"
-  echo "ctx-push [name] Push snapshot(s) from repo .context/ to ~/.context/"
+  echo "ctx-save        Save snapshots from ~/.context/ to repo .context/"
+  echo "ctx-load [name] Load snapshot(s) from repo .context/ to ~/.context/"
+  echo "ctx-backup      Copy .context/ to .context-backup/"
   echo "ctx-help        Show this help"
 }
 
@@ -66,8 +67,8 @@ ctx-ls() {
   done
 }
 
-# Copy all snapshot files to the repo
-ctx-pull() {
+# Save snapshots from ~/.context/ to repo .context/
+ctx-save() {
   local dest="$CTX_REPO_DIR/.context"
   mkdir -p "$dest"
   local count=0
@@ -76,11 +77,11 @@ ctx-pull() {
     cp "$f" "$dest/"
     count=$((count + 1))
   done
-  echo "Copied $count snapshot(s) to $dest"
+  echo "Saved $count snapshot(s) to $dest"
 }
 
-# Push snapshot(s) from repo .context/ to ~/.context/
-ctx-push() {
+# Load snapshot(s) from repo .context/ to ~/.context/
+ctx-load() {
   local src="$CTX_REPO_DIR/.context"
   [ ! -d "$src" ] && echo "No .context/ directory found in repo" && return 1
   mkdir -p "$CTX_DIR"
@@ -88,7 +89,7 @@ ctx-push() {
     local f="$src/mcp-codebase-snapshot-$1.json"
     [ ! -f "$f" ] && echo "Not found: $f" && return 1
     cp "$f" "$CTX_DIR/"
-    echo "Pushed $1 to $CTX_DIR"
+    echo "Loaded $1 to $CTX_DIR"
   else
     local count=0
     for f in "$src"/mcp-codebase-snapshot-*.json; do
@@ -96,8 +97,23 @@ ctx-push() {
       cp "$f" "$CTX_DIR/"
       count=$((count + 1))
     done
-    echo "Pushed $count snapshot(s) to $CTX_DIR"
+    echo "Loaded $count snapshot(s) to $CTX_DIR"
   fi
+}
+
+# Copy .context/ to .context-backup/
+ctx-backup() {
+  local src="$CTX_REPO_DIR/.context"
+  local dest="$CTX_REPO_DIR/.context-backup"
+  [ ! -d "$src" ] && echo "No .context/ directory found in repo" && return 1
+  mkdir -p "$dest"
+  local count=0
+  for f in "$src"/mcp-codebase-snapshot-*.json; do
+    [ ! -f "$f" ] && echo "No snapshots found in $src" && return 1
+    cp "$f" "$dest/"
+    count=$((count + 1))
+  done
+  echo "Backed up $count snapshot(s) to $dest"
 }
 
 # Print current snapshot contents

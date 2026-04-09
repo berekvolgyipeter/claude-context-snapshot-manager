@@ -36,7 +36,8 @@ ctx-ls          List available snapshots (* marks active)
 ctx-read        Print current snapshot contents (requires jq)
 ctx-which       Show which snapshot is active
 ctx-restore     Restore original file from .bak backup
-ctx-pull        Copy all snapshots to repo .context/ (gitignored)
-ctx-push [name] Push snapshot(s) from repo .context/ to ~/.context/
+ctx-save        Save snapshots from ~/.context/ to repo .context/ (gitignored)
+ctx-load [name] Load snapshot(s) from repo .context/ to ~/.context/
+ctx-backup      Copy .context/ to .context-backup/
 ctx-help        Show available commands
 ```
